@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Date for Suchi 💕</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #fdf0f3;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .petals {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .petal {
+    position: absolute;
+    animation: floatDown linear infinite;
+    opacity: 0.45;
+  }
+  @keyframes floatDown {
+    0% { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.5; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    border-radius: 28px;
+    padding: 44px 32px 38px;
+    width: min(430px, 93vw);
+    box-shadow: 0 8px 40px rgba(200,80,100,0.13), 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+
+  .step { display: none; animation: cardIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .step.active { display: block; }
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.88) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .big-emoji { font-size: 72px; margin-bottom: 18px; display: block; }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.5rem, 5vw, 1.95rem);
+    font-weight: 900;
+    color: #2d1a1e;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    font-size: 0.88rem;
+    color: #a07080;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    padding: 14px 28px;
+    border-radius: 50px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(200,80,100,0.2); }
+  .btn:active { transform: scale(0.97); }
+  .btn-yes  { background: #f4a7b9; color: #5a1a2a; }
+  .btn-no   { background: #e8d5f5; color: #5a3a6a; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  .btn-primary {
+    background: #f4a7b9; color: #5a1a2a;
+    width: 100%; font-size: 1rem;
+    padding: 15px; border-radius: 14px;
+    margin-top: 8px;
+  }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Food grid */
+  .food-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+    margin-bottom: 22px;
+  }
+  .food-item {
+    background: #fdf0f3;
+    border-radius: 14px;
+    padding: 14px 6px 10px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #5a1a2a;
+    transition: all 0.18s;
+  }
+  .food-item .fe { font-size: 1.7rem; display: block; margin-bottom: 5px; }
+  .food-item:hover { background: #fce4ec; border-color: #f4a7b9; transform: translateY(-2px); }
+  .food-item.selected { background: #f4a7b9; border-color: #e57a96; }
+
+  /* Form fields */
+  .field-group { margin-bottom: 14px; text-align: left; }
+  .field-label { font-size: 0.82rem; font-weight: 600; color: #a07080; margin-bottom: 5px; }
+
+  input[type="date"], input[type="text"], input[type="url"], select, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #f0d0da;
+    background: #fdf5f7;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: #2d1a1e;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: #f4a7b9; }
+  textarea { resize: none; height: 80px; line-height: 1.5; }
+
+  /* Timezone row */
+  .tz-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1.5px dashed #f0d0da;
+    margin: 20px 0;
+  }
+
+  /* Summary card */
+  .summary-box {
+    background: #fdf0f3;
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin: 18px 0 24px;
+    text-align: left;
+    font-size: 0.88rem;
+    color: #5a1a2a;
+    line-height: 2;
+  }
+  .summary-box span { font-weight: 700; }
+
+  /* Confetti */
+  .confetti-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
+  .confetto {
+    position: absolute;
+    animation: confettiFall 1.6s ease-in forwards;
+    border-radius: 2px;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  .footer {
+    position: fixed; bottom: 12px; width: 100%;
+    text-align: center; font-size: 0.7rem; color: #d0a0b0; z-index: 2;
+  }
+
+  .hearts { font-size: 1.5rem; letter-spacing: 6px; margin-top: 22px; }
+
+  /* Facetime badge */
+  .ft-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #e8f5e9; color: #2e7d32;
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 0.78rem; font-weight: 600;
+    margin-bottom: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div class="petals" id="petals"></div>
+
+<div class="card" id="card">
+
+  <!-- STEP 1: The Ask -->
+  <div class="step active" id="step1">
+    <span class="big-emoji">📱</span>
+    <h1>Suchi, will you go on a FaceTime date with me? 💕</h1>
+    <p class="subtitle">no pressure, but I already told my mom you said yes 😇</p>
+    <div class="btn-row">
+      <button class="btn btn-yes" onclick="goStep(2)">YES 💕</button>
+      <button class="btn btn-no" id="btn-no" onmouseover="runAway(this)" onclick="runAway(this)">no... 🙈</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: She said yes! -->
+  <div class="step" id="step2">
+    <span class="big-emoji">🎉</span>
+    <h1>SHE SAID YES 😭✨</h1>
+    <p class="subtitle">okay okay calm down Shubh. breathe. you got this.<br>let's plan the best virtual date ever 🚀</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(3)">let's plan it →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Pick date & time -->
+  <div class="step" id="step3">
+    <span style="font-size:48px;display:block;margin-bottom:14px;">📅✨</span>
+    <h1>So... when are you free?</h1>
+    <p class="subtitle">I'll clear my whole schedule. no cap.</p>
+
+    <div class="field-group">
+      <div class="field-label">Pick a Day 🌸</div>
+      <input type="date" id="date-pick" onchange="checkStep3()" />
+    </div>
+
+    <div class="tz-row">
+      <div class="field-group">
+        <div class="field-label">Your Time 🕐</div>
+        <select id="time-pick" onchange="checkStep3()">
+          <option value="">Select...</option>
+          <option value="9am">9:00 AM — rise and shine 🌅</option>
+          <option value="10am">10:00 AM — morning vibes ☕</option>
+          <option value="11am">11:00 AM — brunch szn 🥞</option>
+          <option value="12pm">12:00 PM — lunch date 🍱</option>
+          <option value="1pm">1:00 PM — post-lunch chill 😌</option>
+          <option value="2pm">2:00 PM — afternoon delight ✨</option>
+          <option value="3pm">3:00 PM — snack o'clock 🍿</option>
+          <option value="4pm">4:00 PM — golden hour 🌤️</option>
+          <option value="5pm">5:00 PM — early bird 🐦</option>
+          <option value="6pm">6:00 PM — perfect tbh 💕</option>
+          <option value="7pm">7:00 PM — dinner o'clock 🍽️</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Your Timezone 🌍</div>
+        <select id="tz-pick" onchange="checkStep3()">
+          <option value="">Select...</option>
+          <option value="EST">EST (New York)</option>
+          <option value="CST">CST (Chicago)</option>
+          <option value="MST">MST (Denver)</option>
+          <option value="PST">PST (LA)</option>
+          <option value="IST">IST (India)</option>
+          <option value="GMT">GMT (London)</option>
+          <option value="CET">CET (Europe)</option>
+          <option value="SGT">SGT (Singapore)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="step3-next" onclick="goStep(4)" disabled>next →</button>
+  </div>
+
+  <!-- STEP 4: What cuisine? -->
+  <div class="step" id="step4">
+    <h1>What are we feeling? 🍽️✨</h1>
+    <p class="subtitle">we'll eat together, just... apart 🥺</p>
+    <div class="food-grid">
+      <div class="food-item" onclick="selectFood(this,'Indian 🇮🇳')"><span class="fe">🍛</span>Indian</div>
+      <div class="food-item" onclick="selectFood(this,'Biryani 🍚')"><span class="fe">🍚</span>Biryani</div>
+      <div class="food-item" onclick="selectFood(this,'Sushi 🍱')"><span class="fe">🍱</span>Sushi</div>
+      <div class="food-item" onclick="selectFood(this,'Pizza 🍕')"><span class="fe">🍕</span>Pizza</div>
+      <div class="food-item" onclick="selectFood(this,'Pasta 🍝')"><span class="fe">🍝</span>Pasta</div>
+      <div class="food-item" onclick="selectFood(this,'Tacos 🌮')"><span class="fe">🌮</span>Tacos</div>
+      <div class="food-item" onclick="selectFood(this,'Ramen 🍜')"><span class="fe">🍜</span>Ramen</div>
+      <div class="food-item" onclick="selectFood(this,'Burgers 🍔')"><span class="fe">🍔</span>Burgers</div>
+      <div class="food-item" onclick="selectFood(this,'Surprise me! 🎲')"><span class="fe">🎲</span>Surprise!</div>
+    </div>
+    <button class="btn btn-primary" id="food-next" onclick="goStep(5)" style="display:none">yes, that! →</button>
+  </div>
+
+  <!-- STEP 5: Restaurant suggestion -->
+  <div class="step" id="step5">
+    <span style="font-size:48px;display:block;margin-bottom:14px;">🏪💌</span>
+    <h1>Where should I order from for you?</h1>
+    <p class="subtitle">I'm treating you tonight 🥹 drop your fave spot and I'll handle the rest</p>
+
+    <div class="field-group">
+      <div class="field-label">Your favourite restaurant 🍽️</div>
+      <input type="text" id="restaurant" placeholder="e.g. Taj Mahal Kitchen, Domino's..." oninput="checkStep5()" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Any special request or dish? ✨</div>
+      <textarea id="special-req" placeholder="e.g. extra naan, no spice, extra sauce on the side..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Your delivery address 📍</div>
+      <input type="text" id="address" placeholder="so I can send it to you 🚚" oninput="checkStep5()" />
+    </div>
+
+    <button class="btn btn-primary" id="step5-next" onclick="goStep(6)" disabled>it's a date! 💕</button>
+  </div>
+
+  <!-- STEP 6: Final confirmation -->
+  <div class="step" id="step6">
+    <span class="big-emoji">💌</span>
+    <div class="ft-badge">📱 FaceTime Date Confirmed</div>
+    <h1>glad you didn't say no, Suchi.</h1>
+
+    <div class="summary-box" id="summary-box"></div>
+
+    <p style="font-size:0.88rem;color:#a07080;line-height:1.7;">
+      I'll call you right on time. your food is handled. all you gotta do is look cute<br>
+      <span style="font-size:0.8rem;color:#c09090;">(which you always do 🥺)</span>
+    </p>
+
+    <p style="margin-top:18px;font-size:0.78rem;color:#c09090;font-style:italic;">
+      P.S. normal people text. Shubh made a whole website during lunch. for you. no big deal.
+    </p>
+
+    <div class="hearts">💗 💕 💗</div>
+  </div>
+
+</div>
+
+<div class="footer">made with 💕 by Shubh, just for Suchi</div>
+<div class="confetti-wrap" id="confetti"></div>
+
+<script>
+  // Petals
+  const petalEmojis = ['🌸','💕','✨','🌺','💮','🌼'];
+  const petalsEl = document.getElementById('petals');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('span');
+    p.className = 'petal';
+    p.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (7 + Math.random() * 9) + 's';
+    p.style.animationDelay = (Math.random() * 9) + 's';
+    p.style.fontSize = (0.75 + Math.random() * 0.9) + 'rem';
+    petalsEl.appendChild(p);
+  }
+
+  // Step nav
+  function goStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+    window.scrollTo(0,0);
+    if (n === 2 || n === 6) launchConfetti();
+    if (n === 6) buildSummary();
+  }
+
+  // No button runs away
+  function runAway(btn) {
+    const rx = (Math.random() - 0.5) * 200;
+    const ry = (Math.random() - 0.5) * 80;
+    btn.style.transform = `translate(${rx}px, ${ry}px)`;
+  }
+
+  // Step 3 validation
+  const dateInput = document.getElementById('date-pick');
+  dateInput.min = new Date().toISOString().split('T')[0];
+  function checkStep3() {
+    const ok = dateInput.value && document.getElementById('time-pick').value && document.getElementById('tz-pick').value;
+    const btn = document.getElementById('step3-next');
+    btn.disabled = !ok;
+  }
+
+  // Food
+  let selectedFood = '';
+  function selectFood(el, name) {
+    document.querySelectorAll('.food-item').forEach(f => f.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedFood = name;
+    document.getElementById('food-next').style.display = 'block';
+  }
+
+  // Step 5 validation
+  function checkStep5() {
+    const ok = document.getElementById('restaurant').value.trim() && document.getElementById('address').value.trim();
+    const btn = document.getElementById('step5-next');
+    btn.disabled = !ok;
+  }
+
+  // Summary
+  function buildSummary() {
+    const d = dateInput.value;
+    const t = document.getElementById('time-pick').value;
+    const tz = document.getElementById('tz-pick').value;
+    const restaurant = document.getElementById('restaurant').value;
+    const special = document.getElementById('special-req').value;
+    const address = document.getElementById('address').value;
+
+    const tLabels = { '9am':'9:00 AM','10am':'10:00 AM','11am':'11:00 AM','12pm':'12:00 PM','1pm':'1:00 PM','2pm':'2:00 PM','3pm':'3:00 PM','4pm':'4:00 PM','5pm':'5:00 PM','6pm':'6:00 PM','7pm':'7:00 PM' };
+
+    let dateStr = '';
+    if (d) {
+      const dateObj = new Date(d + 'T12:00:00');
+      dateStr = dateObj.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+    }
+
+    document.getElementById('summary-box').innerHTML = `
+      📅 <span>Date:</span> ${dateStr}<br>
+      🕐 <span>Time:</span> ${tLabels[t] || t} ${tz}<br>
+      🍽️ <span>Cuisine:</span> ${selectedFood}<br>
+      🏪 <span>Ordering from:</span> ${restaurant}<br>
+      ${special ? `✨ <span>Special request:</span> ${special}<br>` : ''}
+      📍 <span>Delivering to:</span> ${address}
+    `;
+  }
+
+  // Confetti
+  function launchConfetti() {
+    const colors = ['#f4a7b9','#e8d5f5','#ffd6e0','#c8f7c5','#ffeaa7','#ff6b9d','#b5ead7'];
+    const wrap = document.getElementById('confetti');
+    wrap.innerHTML = '';
+    for (let i = 0; i < 70; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetto';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = '-10px';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDelay = (Math.random() * 0.9) + 's';
+      c.style.animationDuration = (1.2 + Math.random() * 1.2) + 's';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '3px';
+      const size = (6 + Math.random() * 7) + 'px';
+      c.style.width = size; c.style.height = size;
+      wrap.appendChild(c);
+    }
+    setTimeout(() => wrap.innerHTML = '', 3500);
+  }
+</script>
+</body>
+</html>
